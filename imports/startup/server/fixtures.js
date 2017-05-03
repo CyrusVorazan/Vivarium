@@ -2,6 +2,7 @@
 
 import { Meteor } from 'meteor/meteor';
 import { Links } from '../../api/links/links.js';
+import { Models } from '../../api/models/models.js';
 
 Meteor.startup(() => {
   // if the Links collection is empty
