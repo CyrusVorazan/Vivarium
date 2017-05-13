@@ -1,15 +1,16 @@
 <template name="modelList">
   <h2>Models</h2>
   <ul>
-    <li>
-      <form class="modelList-link-add">
-        <input type="text" name="title" placeholder="Title" required>
-        <input type="file" name="file" required>
-        <input type="submit" name="submit" value="Add new link">
-      </form>
-    </li>
-    {{#each models}}
-      <li><a href="{{url}}" target="_blank">{{title}}</a></li>
+    {{#each model in models}}
+    <div class="ui relaxed divided list">
+      <div class="item">
+        <i class="large unhide middle aligned icon"></i>
+        <div class="content">
+          <a href="{{pathFor 'Models.view' _id=model._id}}" class="header">{{model.title}}</a>
+          <div class="description">Yet another 3D model with a generic description</div>
+        </div>
+      </div>
+    </div>
     {{/each}}
   </ul>
 </template>

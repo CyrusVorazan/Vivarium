@@ -1,6 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 import './viewer.html';
 import { Models } from '/imports/api/models/models.js';
+import { Revisions } from '/imports/api/revisions/revisions.js';
+import { ActiveRoute } from 'meteor/zimme:active-route';
 
 import THREE from 'three';
 import { STLLoader } from './STLLoader.js';
@@ -21,21 +23,19 @@ function animate() {
 
 Template.viewer.onRendered(function () {
 	scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera( 75, 800 / 600, 1, 10000 );
-    camera.position.z = 50;
-    geometry = new THREE.BoxGeometry( 10, 10, 10 );
-    material = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } );
-    mesh = new THREE.Mesh( geometry, material );
+  camera = new THREE.PerspectiveCamera( 75, 800 / 600, 1, 10000 );
+  camera.position.z = 50;
 
 	var size = 1000;
 	var divisions = 100;
 	gridHelper = new THREE.GridHelper( size, divisions );
 
 	scene.add( gridHelper );
-    scene.add( mesh );
 
-    renderer = new THREE.WebGLRenderer();
-    renderer.setSize( 800, 600 );
+	scene.add( new THREE.HemisphereLight( 0x443333, 0x222233, 4 ) );
+
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize( 800, 600 );
 
 	raycaster = new THREE.Raycaster();
 
@@ -48,17 +48,42 @@ Template.viewer.onRendered(function () {
 });
 
 Template.viewer.onCreated(function () {
-  Meteor.subscribe('models.all');
+	Meteor.subscribe('models.all', {
+	  onReady: function () {
+			if (ActiveRoute.name('Models.view')) {
+		      var model = Models.findOne(FlowRouter.getParam('_id'));
+
+					Meteor.subscribe('revisions.all', {
+					  onReady: function () {
+					      var revision = Revisions.findOne({ modelId: model._id });
+
+								var buffer = atob(revision.file);
+
+								var loader = new THREE.STLLoader();
+								var geometry = loader.parse(buffer);
+								var material = new THREE.MeshStandardMaterial( { color: Math.random() * 0xffffff } );
+								var mesh = new THREE.Mesh( geometry, material );
+								scene.add( mesh );
+						},
+					  onError: function () { console.log("onError", arguments); }
+					});
+		  }
+		},
+	  onError: function () { console.log("onError", arguments); }
+	});
 });
 
 Template.viewer.helpers({
   models() {
     return Models.find({});
   },
+	revisions() {
+		return Revisions.find({});
+	}
 });
 
 Template.viewer.events({
-  'submit .modelList-link-add'(event) {
+  'submit .revisions-revision-add'(event) {
     event.preventDefault();
 
     const target = event.target;
@@ -78,7 +103,7 @@ Template.viewer.events({
 			    binary += String.fromCharCode( bytes[ i ] );
 		  }
 
-	    Meteor.call('models.insert', title.value, btoa(binary), (error) => {
+	    Meteor.call('revisions.insert', title.value, "", btoa(binary), (error) => {
 	      if (error) {
 	        alert(error.error);
 	      } else {
