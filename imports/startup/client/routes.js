@@ -24,14 +24,14 @@ FlowRouter.route('/add', {
   },
 });
 
-FlowRouter.route('/3dview', {
+FlowRouter.route('/3dview/:_id', {
   name: 'Models.view',
   action(params, queryParams) {
     BlazeLayout.render('App_body', { main: 'App_3dview' });
   }
 });
 
-FlowRouter.route('/3dview/:_id', {
+FlowRouter.route('/3dview/:_id/:_revisionId', {
   name: 'Models.view',
   action(params, queryParams) {
     BlazeLayout.render('App_body', { main: 'App_3dview' });

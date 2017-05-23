@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import './viewer.html';
 import { Models } from '/imports/api/models/models.js';
 import { Revisions } from '/imports/api/revisions/revisions.js';
+import { Comments } from '/imports/api/comments/comments.js';
 import { ActiveRoute } from 'meteor/zimme:active-route';
 
 import THREE from 'three';
@@ -15,8 +16,6 @@ function render() {
 
 function animate() {
     requestAnimationFrame( animate );
-	//mesh.rotation.x += 0.01;
-  // mesh.rotation.y += 0.02;
 	controls.update();
 	render();
 }
@@ -24,7 +23,9 @@ function animate() {
 Template.viewer.onRendered(function () {
 	scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera( 75, 800 / 600, 1, 10000 );
-  camera.position.z = 50;
+
+	camera.position.set(30, 30, 30);
+	camera.rotation.set(0, 0, 0);
 
 	var size = 1000;
 	var divisions = 100;
@@ -36,6 +37,7 @@ Template.viewer.onRendered(function () {
 
   renderer = new THREE.WebGLRenderer();
   renderer.setSize( 800, 600 );
+	renderer.setClearColor(0xFFFFFF);
 
 	raycaster = new THREE.Raycaster();
 
@@ -52,10 +54,15 @@ Template.viewer.onCreated(function () {
 	  onReady: function () {
 			if (ActiveRoute.name('Models.view')) {
 		      var model = Models.findOne(FlowRouter.getParam('_id'));
+					var revisionId = FlowRouter.getParam('_revisionId');
 
 					Meteor.subscribe('revisions.all', {
 					  onReady: function () {
-					      var revision = Revisions.findOne({ modelId: model._id });
+								var revision;
+								if (revisionId)
+									revision = Revisions.findOne({ modelId: model._id, _id: revisionId });
+								else
+									revision = Revisions.findOne({ modelId: model._id });
 
 								var buffer = atob(revision.file);
 
@@ -64,6 +71,8 @@ Template.viewer.onCreated(function () {
 								var material = new THREE.MeshStandardMaterial( { color: Math.random() * 0xffffff } );
 								var mesh = new THREE.Mesh( geometry, material );
 								scene.add( mesh );
+
+								Meteor.subscribe('comments.all');
 						},
 					  onError: function () { console.log("onError", arguments); }
 					});
@@ -79,6 +88,12 @@ Template.viewer.helpers({
   },
 	revisions() {
 		return Revisions.find({});
+	},
+	comments() {
+		return Comments.find({});
+	},
+	userName(id) {
+		return Meteor.users.findOne({_id: id}).emails[0].address;
 	}
 });
 
@@ -103,7 +118,7 @@ Template.viewer.events({
 			    binary += String.fromCharCode( bytes[ i ] );
 		  }
 
-	    Meteor.call('revisions.insert', title.value, "", btoa(binary), (error) => {
+	    Meteor.call('revisions.insert', FlowRouter.getParam('_id'), title.value, "", btoa(binary), (error) => {
 	      if (error) {
 	        alert(error.error);
 	      } else {
@@ -121,4 +136,30 @@ Template.viewer.events({
 
 		reader.readAsArrayBuffer(file.files[0]);
   },
+  'click .revlink'(event) {
+    var link = event.currentTarget;
+		FlowRouter.go(link.href);
+  },
+	'submit .comments-comment-add'(event) {
+    event.preventDefault();
+
+    const target = event.target;
+    const text = target.text;
+
+		var revisionId = FlowRouter.getParam('_revisionId');
+
+		console.log(Meteor.userId());
+		console.log(revisionId);
+
+		if (!revisionId)
+			revisionId = Revisions.findOne({ modelId: FlowRouter.getParam('_id') })._id;
+
+    Meteor.call('comments.insert', Meteor.userId(), revisionId, text.value, (error) => {
+      if (error) {
+        alert(error.error);
+      } else {
+        text.value = '';
+      }
+    });
+  }
 });
