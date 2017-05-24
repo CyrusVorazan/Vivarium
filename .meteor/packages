@@ -27,7 +27,7 @@ juliancwirko:postcss
 jquery@1.11.10
 meteortoys:allthings
 msavin:mongol
-accounts-password@1.3.6
+accounts-password
 accounts-ui@1.1.9
 zimme:active-route
 arillo:flow-router-helpers

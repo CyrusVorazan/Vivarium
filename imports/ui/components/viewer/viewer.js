@@ -22,7 +22,19 @@ function animate() {
 
 Template.viewer.onRendered(function () {
 	scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera( 75, 800 / 600, 1, 10000 );
+
+	var element = this.find('.3d-viewer').parentElement;
+
+	var styles = window.getComputedStyle(element);
+  var padding = parseFloat(styles.paddingLeft) +
+                parseFloat(styles.paddingRight);
+
+  var width = element.clientWidth - padding;
+
+	console.log(width);
+	var height = width * 3 / 4 - parseFloat(styles.paddingBottom);;
+
+  camera = new THREE.PerspectiveCamera( 75, width / height, 1, 10000 );
 
 	camera.position.set(30, 30, 30);
 	camera.rotation.set(0, 0, 0);
@@ -36,7 +48,7 @@ Template.viewer.onRendered(function () {
 	scene.add( new THREE.HemisphereLight( 0x443333, 0x222233, 4 ) );
 
   renderer = new THREE.WebGLRenderer();
-  renderer.setSize( 800, 600 );
+  renderer.setSize( width, height );
 	renderer.setClearColor(0xFFFFFF);
 
 	raycaster = new THREE.Raycaster();
@@ -83,17 +95,20 @@ Template.viewer.onCreated(function () {
 });
 
 Template.viewer.helpers({
-  models() {
-    return Models.find({});
-  },
 	revisions() {
-		return Revisions.find({});
+		return Revisions.find({modelId: FlowRouter.getParam('_id')});
 	},
 	comments() {
-		return Comments.find({});
+		var revisionId = FlowRouter.getParam('_revisionId');
+		if (!revisionId)
+			revisionId = Revisions.findOne({ modelId: FlowRouter.getParam('_id') })._id;
+		return Comments.find({revisionId: revisionId}, { /*limit: limit || 10,*/ sort: {createdAt: -1} });
 	},
 	userName(id) {
 		return Meteor.users.findOne({_id: id}).emails[0].address;
+	},
+	modelName(id) {
+		return Models.findOne({ _id: FlowRouter.getParam('_id') }).title;
 	}
 });
 
@@ -140,16 +155,17 @@ Template.viewer.events({
     var link = event.currentTarget;
 		FlowRouter.go(link.href);
   },
-	'submit .comments-comment-add'(event) {
+	'click .comment-add'(event) {
     event.preventDefault();
 
-    const target = event.target;
+		console.log("Im here");
+
+    const target = event.target.parentNode;
     const text = target.text;
 
-		var revisionId = FlowRouter.getParam('_revisionId');
+		console.log(target);
 
-		console.log(Meteor.userId());
-		console.log(revisionId);
+		var revisionId = FlowRouter.getParam('_revisionId');
 
 		if (!revisionId)
 			revisionId = Revisions.findOne({ modelId: FlowRouter.getParam('_id') })._id;

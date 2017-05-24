@@ -1,27 +1,61 @@
 <template name="viewer">
 
-<!--
-<div class="ui grid container">
-  <div class="row">
-    <div class="one wide olive column">
-      <h2>Revisions</h2>
-      {{#each revisions}}
-        <li><a class="revlink" href="/3dview/{{modelId}}/{{_id}}">{{title}}</a></li>
-      {{/each}}
-      <form class="revisions-revision-add">
-        <input type="text" name="title" placeholder="Title" required>
-        <input type="file" name="file" required>
-        <input type="submit" name="submit" value="Add new revision">
-      </form>
+<div class="ui grid doubling stackable">
+    <div class="three wide column">
+
+        <h3 class="ui dividing header">Revisions</h3>
+        {{#each revisions}}
+          <li><a class="revlink" href="/3dview/{{modelId}}/{{_id}}">{{title}}</a></li>
+        {{/each}}
+        <form class="revisions-revision-add">
+          <input type="text" name="title" placeholder="Title" required>
+          <input type="file" name="file" required>
+          <input type="submit" name="submit" value="Add new revision">
+        </form>
+
     </div>
-    <div class="eight wide black column">
+
+
+    <div class="nine wide column">
+      <h3 class="ui dividing header">{{modelName}}</h3>
       <div class="3d-viewer">
       </div>
     </div>
-  </div>
-</div>
--->
 
+
+    <div class="four wide column">
+      <div class="ui comments">
+      <h3 class="ui dividing header">Comments</h3>
+      <form class="ui reply form">
+        <div class="field">
+          <textarea name="text" rows="2" style="height: 60px;"></textarea>
+        </div>
+        <div class="ui blue labeled submit icon button comment-add">
+          <i class="icon edit"></i> Add Reply
+        </div>
+      </form>
+
+        {{#each comments}}
+
+        <div class="comment">
+          <div class="content">
+            <a class="author">{{userName userId}}</a>
+            <div class="metadata">
+              <span class="date">{{createdAt}}</span>
+            </div>
+            <div class="text">
+              {{text}}
+            </div>
+          </div>
+        </div>
+
+        {{/each}}
+
+      </div>
+    </div>
+</div>
+
+<!--
   <section id="menu">
     <h2>Revisions</h2>
     {{#each revisions}}
@@ -35,67 +69,37 @@
   </section>
   <section id="content">
     <div class="3d-viewer">
-      <!-- This div will be found by the template to instantiate a renderer -->
     </div>
   </section>
   <section id="comments">
-    <h2>Comments</h2>
-    <form class="comments-comment-add">
-      <input type="text" name="text" placeholder="Text" required>
-      <input type="submit" name="submit" value="Add new comment">
-    </form>
-
-
   <div class="ui comments">
   <h3 class="ui dividing header">Comments</h3>
 
-  {{#each comments}}
+    {{#each comments}}
 
-  <div class="comment">
-    <div class="content">
-      <a class="author">{{userName userId}}</a>
-      <div class="metadata">
-        <span class="date">{{createdAt}}</span>
-      </div>
-      <div class="text">
-        {{text}}
-      </div>
-      <!--
-      <div class="actions">
-        <a class="reply">Reply</a>
-      </div>
-
-      <div class="comments">
-        <div class="comment">
-          <div class="content">
-            <a class="author">Jenny Hess</a>
-            <div class="metadata">
-              <span class="date">Just now</span>
-            </div>
-            <div class="text">
-              Elliot you are always so right :)
-            </div>
-            <div class="actions">
-              <a class="reply">Reply</a>
-            </div>
-          </div>
+    <div class="comment">
+      <div class="content">
+        <a class="author">{{userName userId}}</a>
+        <div class="metadata">
+          <span class="date">{{createdAt}}</span>
+        </div>
+        <div class="text">
+          {{text}}
         </div>
       </div>
-      -->
     </div>
-  </div>
 
-  {{/each}}
+    {{/each}}
 
   <form class="ui reply form">
     <div class="field">
-      <textarea rows="2" style="height: 60px;"></textarea>
+      <textarea name="text" rows="2" style="height: 60px;"></textarea>
     </div>
-    <div class="ui blue labeled submit icon button">
+    <div class="ui blue labeled submit icon button comment-add">
       <i class="icon edit"></i> Add Reply
     </div>
   </form>
 </div>
   </section>
-
+-->
 </template>
