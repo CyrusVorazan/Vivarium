@@ -27,8 +27,11 @@ juliancwirko:postcss
 jquery@1.11.10
 meteortoys:allthings
 msavin:mongol
-accounts-password
+accounts-password@1.3.6
 accounts-ui@1.1.9
 zimme:active-route
 arillo:flow-router-helpers
 aldeed:simple-schema
+email
+useraccounts:semantic-ui
+dburles:factory

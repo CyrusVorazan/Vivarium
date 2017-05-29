@@ -39,7 +39,14 @@ FlowRouter.route('/3dview/:_id/:_revisionId', {
 });
 
 FlowRouter.route('/models', {
-  name: 'Models.show',
+  name: 'Models.mylist',
+  action(params, queryParams) {
+    BlazeLayout.render('App_body', { main: 'App_models' });
+  }
+});
+
+FlowRouter.route('/collabs', {
+  name: 'Models.collablist',
   action(params, queryParams) {
     BlazeLayout.render('App_body', { main: 'App_models' });
   }

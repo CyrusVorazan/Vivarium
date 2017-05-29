@@ -5,7 +5,7 @@ import { Revisions } from '/imports/api/revisions/revisions.js';
 import { SimpleSchema } from 'meteor/aldeed:simple-schema';
 
 Meteor.methods({
-  'models.insert'(userId, title, description) {
+  'models.insert'(userId, title, description, isPublic) {
     check(title, String);
     check(description, String);
 
@@ -13,7 +13,8 @@ Meteor.methods({
       title,
       description,
       createdAt: new Date(),
-      userId
+      userId,
+      isPublic
     });
   },
 });

@@ -17,4 +17,7 @@ Meteor.methods({
       modelId
     });
   },
+  'revisions.remove'(revisionId) {
+    return Revisions.remove(revisionId);
+  },
 });

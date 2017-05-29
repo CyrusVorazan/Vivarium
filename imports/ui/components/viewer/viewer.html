@@ -1,40 +1,112 @@
 <template name="viewer">
 
 <div class="ui grid doubling stackable">
+
     <div class="three wide column">
+      <div style="margin-left:0.3cm;">
+        {{#if isOwner}}
+          <form class="ui dividing form model-collaborator-add">
+            <h3 class="ui dividing header">Invite collaborator</h3>
+            <div class="field">
+              <input type="text" name="email" placeholder="Email" >
+            </div>
+            <button class="ui button" type="submit">Invite</button>
+          </form>
+          {{#if collaboratorsLoaded}}
+            <div class="ui relaxed list">
+              {{#each collaborators}}
+              <div class="item">
+                <div class="ui label content">
+                  <button class="collabdelete" name="{{userId}}" style="{ background:none;border:none; }">
+                    <i class="remove icon"></i>
+                  </button>
+                  <a class="userlink" href="/users/{{userId}}">{{userName userId}}</a>
+                </div>
+              </div>
+              {{/each}}
+            </div>
+          {{else}}
+            Loading...
+          {{/if}}
+        {{/if}}
 
         <h3 class="ui dividing header">Revisions</h3>
-        {{#each revisions}}
-          <li><a class="revlink" href="/3dview/{{modelId}}/{{_id}}">{{title}}</a></li>
-        {{/each}}
-        <form class="revisions-revision-add">
-          <input type="text" name="title" placeholder="Title" required>
-          <input type="file" name="file" required>
-          <input type="submit" name="submit" value="Add new revision">
-        </form>
 
-    </div>
+        {{#if isOwner}}
+          <form class="ui dividing form revisions-revision-add">
+            <div class="field">
+              <input type="text" name="title" placeholder="Title" required>
+            </div>
+            <div class="field">
+              <input type="file" name="file" required>
+            </div>
+            <button class="ui button" type="submit">Add new revision</button>
+          </form>
+        {{/if}}
 
+        {{#if revisionsLoaded}}
+        <div class="ui relaxed divided list">
+          {{#each revisions}}
+          <div class="item">
+            <div class="content">
+              {{#if needDelete}}
+              <button class="revisiondelete" name="{{_id}}" style="{ background:none;border:none; }">
+                <i class="remove icon"></i>
+              </button>
+              {{/if}}
+              {{title}}
 
-    <div class="nine wide column">
-      <h3 class="ui dividing header">{{modelName}}</h3>
-      <div class="3d-viewer">
+              <button class="revisiondown" name="{{_id}}" style="{ background:none;border:none;float:right; }">
+                <i class="arrow down icon"></i>
+              </button>
+              <button class="revisionup" name="{{_id}}" style="{ background:none;border:none;float:right; }">
+                <i class="arrow up icon"></i>
+              </button>
+            </div>
+          </div>
+          {{/each}}
+        </div>
+        {{else}}
+          Loading...
+        {{/if}}
       </div>
     </div>
 
 
-    <div class="four wide column">
-      <div class="ui comments">
-      <h3 class="ui dividing header">Comments</h3>
-      <form class="ui reply form">
-        <div class="field">
-          <textarea name="text" rows="2" style="height: 60px;"></textarea>
-        </div>
-        <div class="ui blue labeled submit icon button comment-add">
-          <i class="icon edit"></i> Add Reply
-        </div>
-      </form>
+    <div class="nine wide column">
 
+      {{#if modelLoaded}}
+        <h3 class="ui dividing header">{{modelName}}</h3>
+        <div class="ui checkbox">
+          <input type="checkbox" class="twoway">
+          <label>Two-way comparison</label>
+        </div>
+      {{else}}
+        Loading...
+      {{/if}}
+      <div class="3d-viewers">
+        <div class="3d-viewer"></div>
+        <div class="3d-viewer-2"></div>
+      </div>
+    </div>
+
+
+
+    <div class="four wide column">
+      <div class="ui comments" style="margin-right:1cm;">
+      <h3 class="ui dividing header">Comments</h3>
+      {{#if canComment}}
+        <form class="ui reply form">
+          <div class="field">
+            <textarea name="text" rows="2" style="height: 60px;"></textarea>
+          </div>
+          <div class="ui blue labeled submit icon button comment-add">
+            <i class="icon edit"></i> Add Reply
+          </div>
+        </form>
+      {{/if}}
+
+      {{#if commentsLoaded}}
         {{#each comments}}
 
         <div class="comment">
@@ -46,60 +118,21 @@
             <div class="text">
               {{text}}
             </div>
+            {{#if isOwner}}
+              <div class="actions">
+                <a class="reply">Reply</a>
+                <a class="remove">Remove</a>
+              </div>
+            {{/if}}
           </div>
         </div>
 
         {{/each}}
+      {{/if}}
+
 
       </div>
     </div>
+
 </div>
-
-<!--
-  <section id="menu">
-    <h2>Revisions</h2>
-    {{#each revisions}}
-      <li><a class="revlink" href="/3dview/{{modelId}}/{{_id}}">{{title}}</a></li>
-    {{/each}}
-    <form class="revisions-revision-add">
-      <input type="text" name="title" placeholder="Title" required>
-      <input type="file" name="file" required>
-      <input type="submit" name="submit" value="Add new revision">
-    </form>
-  </section>
-  <section id="content">
-    <div class="3d-viewer">
-    </div>
-  </section>
-  <section id="comments">
-  <div class="ui comments">
-  <h3 class="ui dividing header">Comments</h3>
-
-    {{#each comments}}
-
-    <div class="comment">
-      <div class="content">
-        <a class="author">{{userName userId}}</a>
-        <div class="metadata">
-          <span class="date">{{createdAt}}</span>
-        </div>
-        <div class="text">
-          {{text}}
-        </div>
-      </div>
-    </div>
-
-    {{/each}}
-
-  <form class="ui reply form">
-    <div class="field">
-      <textarea name="text" rows="2" style="height: 60px;"></textarea>
-    </div>
-    <div class="ui blue labeled submit icon button comment-add">
-      <i class="icon edit"></i> Add Reply
-    </div>
-  </form>
-</div>
-  </section>
--->
 </template>

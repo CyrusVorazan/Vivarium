@@ -11,3 +11,6 @@ import '../../api/revisions/server/publications.js';
 
 import '../../api/comments/methods.js';
 import '../../api/comments/server/publications.js';
+
+import '../../api/collaborators/methods.js';
+import '../../api/collaborators/server/publications.js';

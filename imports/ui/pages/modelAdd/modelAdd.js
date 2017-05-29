@@ -33,6 +33,7 @@ Template.App_model_add.events({
     const title = target.title;
     const description = target.description;
     const file = target.file;
+    const isPublic = target.public.checked;
 
 		var reader = new FileReader();
 		reader.onloadend = function(evt) {
@@ -45,7 +46,7 @@ Template.App_model_add.events({
 			    binary += String.fromCharCode( bytes[ i ] );
 		  }
 
-      Meteor.call('models.insert', Meteor.userId(), title.value, description.value, (error, result) => {
+      Meteor.call('models.insert', Meteor.userId(), title.value, description.value, isPublic, (error, result) => {
         if (error) {
           alert(error.error);
         }

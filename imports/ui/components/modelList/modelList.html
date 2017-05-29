@@ -1,16 +1,27 @@
 <template name="modelList">
-  <h2>Models</h2>
-  <ul>
-    {{#each model in models}}
-    <div class="ui relaxed divided list">
-      <div class="item">
-        <i class="large unhide middle aligned icon"></i>
-        <div class="content">
-          <a href="{{pathFor 'Models.view' _id=model._id}}" class="header">{{model.title}}</a>
-          <div class="description">Yet another 3D model with a generic description</div>
+<div class="ui container grid doubling stackable">
+  <div class="sixteen wide column">
+  <h2 class="ui dividing header">{{#if isMyModels}} My models
+      {{else}} {{#if isMyCollabs}} My collaborations
+      {{else}} Public models {{/if}}
+    {{/if}}</h2>
+      {{#if models.count}}
+      {{#each model in models}}
+      <div class="ui relaxed divided list">
+        <div class="item">
+          <!--<i class="large unhide middle aligned icon"></i>-->
+          <div class="content">
+            <a href="{{pathFor 'Models.view' _id=model._id}}" class="header">{{model.title}}</a>
+            <div class="description">{{model.description}}</div>
+            {{#if isMyModels}} {{#if model.isPublic}} Public {{else}} Private {{/if}}
+            {{else}} Owner: {{userName model.userId}} {{/if}}
+          </div>
         </div>
       </div>
-    </div>
-    {{/each}}
-  </ul>
+      {{/each}}
+      {{else}}
+      <div class="text">Empty here!</div>
+    {{/if}}
+  </div>
+</div>
 </template>

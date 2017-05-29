@@ -4,20 +4,20 @@
 
 import { Meteor } from 'meteor/meteor';
 import { assert } from 'meteor/practicalmeteor:chai';
-import { Links } from './links.js';
+import { Models } from './models.js';
 
 if (Meteor.isServer) {
-  describe('links collection', function () {
+  describe('models collection', function () {
     it('insert correctly', function () {
-      const linkId = Links.insert({
-        title: 'meteor homepage',
-        url: 'https://www.meteor.com',
+      const modelId = Models.insert({
+        title: 'testtitle',
+        description: 'testdescription',
       });
-      const added = Links.find({ _id: linkId });
+      const added = Models.find({ _id: modelId });
       const collectionName = added._getCollectionName();
       const count = added.count();
 
-      assert.equal(collectionName, 'links');
+      assert.equal(collectionName, 'models');
       assert.equal(count, 1);
     });
   });
